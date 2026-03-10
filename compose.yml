@@ -1,0 +1,8 @@
+services:
+  sandbox:
+    build:
+      context: ./docker
+      args:
+        CLAUDE_CODE_OAUTH_TOKEN: ${CLAUDE_CODE_OAUTH_TOKEN}
+        GH_TOKEN: ${GH_TOKEN}
+    image: claude-dev-sandbox
