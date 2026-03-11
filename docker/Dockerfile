@@ -13,7 +13,11 @@ RUN apt-get update -y && apt-get install -y \
     libgl1 \
     libglib2.0-0 \
     neovim \
+    git \
+    git-lfs \
     gh 
+
+RUN git lfs install 
 
 # Install clang-tidy and clang-format from LLVM apt repos
 ARG LLVM_VERSION=21
@@ -41,13 +45,10 @@ ARG GH_TOKEN
 ENV GH_TOKEN=$GH_TOKEN
 
 
-USER agent
 
-# Copy and register init script
-USER root
+# Copy init script
 COPY shell_init.sh /usr/local/bin/shell_init.sh
-RUN chmod +x /usr/local/bin/shell_init.sh \
-    && echo '. /usr/local/bin/shell_init.sh' >> /etc/sandbox-persistent.sh
+RUN chmod +x /usr/local/bin/shell_init.sh
 
 # Copy Claude skills
 COPY claude-skills/ /home/agent/.claude/skills/

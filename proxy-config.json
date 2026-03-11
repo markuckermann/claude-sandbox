@@ -1,0 +1,50 @@
+{
+  "policy": {
+    "default": "deny",
+    "logBlocked": true,
+    "logAllowed": true
+  },
+  "network": {
+    "allowedDomains": [
+      "api.anthropic.com:443",
+      "statsig.anthropic.com:443",
+      "platform.claude.com:443",
+      "hub.docker.com:443",
+      "*.docker.com:443",
+      "api.github.com:443",
+      "gist.github.com:443",
+      "github.com:443",
+      "*.github.com:443",
+      "raw.githubusercontent.com:443",
+      "ports.ubuntu.com:443",
+      "ports.ubuntu.com:80",
+      "go.dev:443",
+      "*.go.dev:443",
+      "registry.docker.io:443",
+      "*.docker.io:443",
+      "*.golang.org:443",
+      "registry.npmjs.org:443",
+      "*.npmjs.org:443",
+      "pypi.org:443",
+      "*.pypi.org:443",
+      "rubygems.org:443"
+    ],
+    "blockedDomains": [
+      "metadata.azure.internal",
+      "metadata.google.internal",
+      "kube-dns.kube-system.svc.cluster.local"
+    ],
+    "blockedCIDRs": [
+      "10.0.0.0/8",
+      "127.0.0.0/8",
+      "169.254.0.0/16",
+      "172.16.0.0/12",
+      "192.168.0.0/16",
+      "::1/128",
+      "fc00::/7",
+      "fe80::/10"
+    ],
+    "bypassDomains": [],
+    "bypassCIDRs": []
+  }
+}
