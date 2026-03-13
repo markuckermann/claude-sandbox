@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ ! -f ~/.sandbox_init_done ]; then
+if [ ! -f ~/.sandbox_post_create_done ]; then
 
   # This ensures that claude authenticates using oauth
   echo '{"hasCompletedOnboarding": true, "bypassPermissionsModeAccepted": true}' > ~/.claude.json
@@ -8,5 +8,5 @@ if [ ! -f ~/.sandbox_init_done ]; then
   claude plugin marketplace add anthropics/claude-plugins-official
   claude plugin install superpowers
   
-  touch ~/.sandbox_init_done
+  touch ~/.sandbox_post_create_done
 fi

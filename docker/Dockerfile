@@ -45,13 +45,15 @@ ARG GH_TOKEN
 ENV GH_TOKEN=$GH_TOKEN
 
 
-
 # Copy init script
-COPY shell_init.sh /usr/local/bin/shell_init.sh
-RUN chmod +x /usr/local/bin/shell_init.sh
+COPY post_create.sh /usr/local/bin/post_create.sh
+RUN chmod +x /usr/local/bin/post_create.sh
 
 # Copy Claude skills
 COPY claude-skills/ /home/agent/.claude/skills/
 RUN chown -R agent:agent /home/agent/.claude/skills
+
+# Create /builds directory and set permissions
+RUN mkdir -p /builds && chown agent:agent /builds
 
 USER agent
