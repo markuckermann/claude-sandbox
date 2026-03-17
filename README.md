@@ -10,11 +10,11 @@
 build_docker.sh
 ```
 ```
-docker sandbox run -t claude-dev-sandbox claude [PATH]
+docker sandbox run -t claude-sandbox-image claude [PATH]
 ```
 
 ```
-docker sandbox create -t claude-dev-sandbox -D --name test claude .
+docker sandbox create -t claude-sandbox-image -D --name test claude .
 docker sandbox exec -it test bash
 ```
 
@@ -25,5 +25,5 @@ git clone beeline-firmware-nrf beeline-firmware-nrf-sandbox
 cd beeline-firmware-nrf-sandbox 
 git remote rename origin upstream
 
-docker sandbox create -t claude-dev-sandbox -D --name bl-fw-nrf claude .
-docker sandbox exec bl-fw-nrf bash /usr/local/bin/shell_init.sh
+docker sandbox create -t claude-sandbox-image -D --name bl-fw-nrf claude .
+docker sandbox exec bl-fw-nrf bash /usr/local/bin/post_create.sh

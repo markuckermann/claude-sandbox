@@ -53,7 +53,8 @@ RUN chmod +x /usr/local/bin/post_create.sh
 COPY claude-skills/ /home/agent/.claude/skills/
 RUN chown -R agent:agent /home/agent/.claude/skills
 
-# Create /builds directory and set permissions
-RUN mkdir -p /builds && chown agent:agent /builds
+# Create /build directory and set permissions
+RUN mkdir -p /build && chown agent:agent /build
+ENV ROOT_BUILD_DIR=/build
 
 USER agent
