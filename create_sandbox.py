@@ -1,49 +1,53 @@
 #!/usr/bin/env python3
 import argparse
-import os
 import subprocess
-import sys
+from dataclasses import dataclass
+from pathlib import Path
+
+REPO_DIR = Path(__file__).resolve().parent
+
+
+@dataclass
+class MountPath:
+    path: Path
+    readonly: bool
+
+    @classmethod
+    def parse(cls, p: str) -> "MountPath":
+        if p.endswith(":readonly") or p.endswith(":ro"):
+            raw = p.rsplit(":", 1)[0]
+            return cls(path=Path(raw).resolve(), readonly=True)
+        return cls(path=Path(p).resolve(), readonly=False)
+
+    def __str__(self) -> str:
+        return f"{self.path}:ro" if self.readonly else str(self.path)
+
+
+def create_sandbox(name: str, workspace_paths: list[str]) -> None:
+    mounts = [MountPath.parse(p) for p in workspace_paths]
+    print(f"Creating sandbox '{name}' with paths: {mounts}")
+    print(f"Running from {REPO_DIR}")
+    subprocess.run(["./build_docker.sh"], cwd=REPO_DIR, check=True)
+    mounts[0].path.mkdir(parents=True, exist_ok=True)
+    cmd = ["docker", "sandbox", "create", "--template", "claude-sandbox-image", "--debug",
+           "--name", name, "claude"] + [str(m) for m in mounts]
+    
+    print(f"Running command: {' '.join(cmd)}")
+    subprocess.run(cmd, check=True)
+
+    print("Running post-creation setup script inside the sandbox...")
+    subprocess.run(
+        ["docker", "sandbox", "exec", name, "bash", "/usr/local/bin/post_create.sh"],
+        check=True,
+    )
 
 
 def main():
     parser = argparse.ArgumentParser(description="Create a Claude sandbox")
     parser.add_argument("name", help="Sandbox name")
-    parser.add_argument("workspace_path", help="Workspace path to mount")
-    parser.add_argument("extra_path", nargs="?", help="Optional extra path to mount")
-    parser.add_argument("--ro", action="store_true", help="Mount extra_path as read-only")
+    parser.add_argument("workspace_paths", nargs="+", help="Paths to mount (append :ro or :readonly for read-only)")
     args = parser.parse_args()
-
-    script_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
-    workspace_path = os.path.realpath(args.workspace_path)
-
-    if args.extra_path:
-        extra_path = os.path.realpath(args.extra_path)
-        mount = f"{extra_path}:ro" if args.ro else extra_path
-        ro_label = " (read-only)" if args.ro else ""
-        print(f"Creating sandbox '{args.name}' with workspace '{workspace_path}' and extra path '{extra_path}'{ro_label}")
-    else:
-        extra_path = None
-        mount = None
-        print(f"Creating sandbox '{args.name}' with workspace '{workspace_path}'")
-
-    print(f"Running from {script_dir}")
-    os.chdir(script_dir)
-
-    subprocess.run(["./build_docker.sh"], check=True)
-
-    os.makedirs(args.workspace_path, exist_ok=True)
-
-    cmd = ["docker", "sandbox", "create", "-t", "claude-sandbox-image", "-D",
-           "--name", args.name, "claude", workspace_path]
-    if mount:
-        cmd.append(mount)
-    subprocess.run(cmd, check=True)
-
-    subprocess.run(
-        ["docker", "sandbox", "exec", args.name, "bash", "/usr/local/bin/post_create.sh"],
-        check=True,
-    )
-
+    create_sandbox(args.name, args.workspace_paths)
     print()
     print("Now run")
     print(f"docker sandbox exec -it {args.name} bash")
